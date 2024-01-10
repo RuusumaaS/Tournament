@@ -4,8 +4,6 @@
  */
 package com.roseland.tournament;
 
-import java.util.Comparator;
-import java.util.List;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,21 +12,13 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import java.util.Map;
-
-
 /**
  *
  * @author asus
  */
-public class TeamsWindow extends Application {
+public class LeagueWindow extends Application {
     
-    private String name;
-    private Map<String,Integer> matchRules;
-    private List<Comparator<Team>> tableRules;
-    private Map<String,Double> statsToCollect;
-    private int matches;
-    
+    private League league;
     
     @Override
     public void start(Stage primaryStage) {
@@ -50,24 +40,5 @@ public class TeamsWindow extends Application {
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-
-    
-    public void setArguments(String leagueName,Map<String,Integer> matchRules
-            ,List<Comparator<Team>> tableRules, Map<String,Double> statsToCollect, int matches){
-        this.name = leagueName;
-        this.matchRules = matchRules;
-        this.tableRules = tableRules;
-        this.statsToCollect = statsToCollect;
-        this.matches = matches;
-    }
-     
-    public String getLeagueName(){
-         return this.name;
-    }
-    
-    public void createLeague(){
-        
-    }
-    
+    }    
 }

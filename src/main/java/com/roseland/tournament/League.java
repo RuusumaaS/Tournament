@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
 import java.util.Map;
+import java.util.List;
 
 /**
  *
@@ -16,10 +17,10 @@ import java.util.Map;
 public class League {
     private Vector<Team> teams; 
     private Vector<Match> matches;
-    private Vector<Comparator<Team>> tableRules;
+    private List<Comparator<Team>> tableRules;
     private Map<String, Integer> matchRules; 
     
-    public League(Vector<Team> teams, Vector<Match> matches,Vector<Comparator<Team>> tableRules,
+    public League(Vector<Team> teams, Vector<Match> matches,List<Comparator<Team>> tableRules,
             Map<String, Integer> matchRules){
         this.teams = teams;
         this.matches = matches;
