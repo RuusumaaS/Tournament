@@ -6,8 +6,8 @@ package com.roseland.tournament;
 
 import java.util.Comparator;
 import java.util.Vector;
-import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.function.UnaryOperator;
@@ -26,7 +26,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 

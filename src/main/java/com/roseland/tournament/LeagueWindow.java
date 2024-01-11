@@ -11,6 +11,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 
 /**
  *
@@ -22,6 +24,16 @@ public class LeagueWindow extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+        
+        TabPane tabPane = new TabPane();
+
+        Tab tableTab = new Tab("Leaguetable");
+        Tab resultsTab = new Tab("Results");
+        Tab fixturesTab = new Tab("Fixtures");
+        Tab statisticsTab = new Tab("Team statistics");
+        Tab playGameTab = new Tab("Play next match");
+        
+        
         Button btn = new Button();
         btn.setText("Say 'Hello World'");
         btn.setOnAction(new EventHandler<ActionEvent>() {
@@ -32,8 +44,10 @@ public class LeagueWindow extends Application {
             }
         });
         
+        tabPane.getTabs().addAll(tableTab,playGameTab,fixturesTab,resultsTab,statisticsTab);
+        
         StackPane root = new StackPane();
-        root.getChildren().add(btn);
+        root.getChildren().add(tabPane);
         
         Scene scene = new Scene(root, 300, 250);
         
@@ -41,4 +55,8 @@ public class LeagueWindow extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }    
+    
+    public void setLeague(League league){
+        this.league = league;
+    }
 }

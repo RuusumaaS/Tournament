@@ -11,7 +11,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 
@@ -26,8 +25,8 @@ public class App extends Application {
         var javafxVersion = SystemInfo.javafxVersion();
 
         GridPane mainGrid = new GridPane();
-        
-        GridPane basicInfoGrid = new GridPane();
+        mainGrid.setHgap(20);
+        mainGrid.setVgap(10);
         
         Label enterLeagueLabel = new Label("League name:");
         TextField leagueNameField = new TextField("League name");
@@ -52,12 +51,12 @@ public class App extends Application {
             });
         
         mainGrid.add(enterLeagueLabel, 0, 0);
-        mainGrid.add(leagueNameField,0,1,1,2);
-        mainGrid.add(leagueRadioButton,1,0);
-        mainGrid.add(tournamentRadioButton,2,0);
-        mainGrid.add(createButton,3,1);
+        mainGrid.add(leagueNameField,1,0,1,1);
+        mainGrid.add(leagueRadioButton,1,1);
+        mainGrid.add(tournamentRadioButton,2,1);
+        mainGrid.add(createButton,1,3);
         
-        Scene scene = new Scene(mainGrid, 500, 500);
+        Scene scene = new Scene(mainGrid, 500, 250);
         
         primaryStage.setTitle("Create a League or Tournament!");
         primaryStage.setScene(scene);

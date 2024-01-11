@@ -23,15 +23,7 @@ public class Match {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.statistics = statistics;
-        if(statistics.get("awaygoals") < this.statistics.get("homegoals")){
-            winner = homeTeam;
-        }
-        else if(statistics.get("awaygoals") > this.statistics.get("homegoals")){
-            winner = awayTeam;
-        }
-        else{
-            winner = null;
-        }
+        this.winner = null;
     }
     
     public Map<String,Double> getStatistics(){

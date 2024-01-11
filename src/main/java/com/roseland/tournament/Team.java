@@ -11,7 +11,7 @@ import java.util.Map;
  * @author asus
  */
 public class Team {
-       private String name;
+    private String name;
     private Map<String, Double> statistics;
     
     
@@ -52,8 +52,8 @@ public class Team {
         }
     }
     
-    public Double calculateGoalDifference(){
-        return this.getSpecificStat("scoredgoals")-this.getSpecificStat("concededgoals");
+    public void updateGoalDifference(){
+        statistics.put("GoalDiffernece", this.getSpecificStat("scoredgoals")-this.getSpecificStat("concededgoals"));
     }
 }
 

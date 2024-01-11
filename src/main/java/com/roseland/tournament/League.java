@@ -6,22 +6,24 @@ package com.roseland.tournament;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Vector;
 import java.util.Map;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  *
  * @author asus
  */
 public class League {
-    private Vector<Team> teams; 
-    private Vector<Match> matches;
+    private String name;
+    private ArrayList<Team> teams; 
+    private ArrayList<Match> matches;
     private List<Comparator<Team>> tableRules;
     private Map<String, Integer> matchRules; 
     
-    public League(Vector<Team> teams, Vector<Match> matches,List<Comparator<Team>> tableRules,
+    public League(String name, ArrayList<Team> teams, ArrayList<Match> matches,List<Comparator<Team>> tableRules,
             Map<String, Integer> matchRules){
+        this.name = name;
         this.teams = teams;
         this.matches = matches;
         this.tableRules = tableRules;
@@ -37,11 +39,11 @@ public class League {
         
     }
     
-    public Vector<Team> getTeams(){
+    public ArrayList<Team> getTeams(){
         return this.teams;
     }
     
-    public Vector<Match> getMatches(){
+    public ArrayList<Match> getMatches(){
         return this.matches;
     }
 }
