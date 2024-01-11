@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -20,14 +21,31 @@ public class League {
     private ArrayList<Match> matches;
     private List<Comparator<Team>> tableRules;
     private Map<String, Integer> matchRules; 
+    private boolean hasEt;
+    private ArrayList<String> tableContents;
     
     public League(String name, ArrayList<Team> teams, ArrayList<Match> matches,List<Comparator<Team>> tableRules,
-            Map<String, Integer> matchRules){
+            Map<String, Integer> matchRules, boolean hasET){
         this.name = name;
         this.teams = teams;
         this.matches = matches;
         this.tableRules = tableRules;
         this.matchRules = matchRules;
+        this.hasEt = hasET;
+        this.tableContents = new ArrayList<>();
+        
+        if(hasET){
+            this.tableContents.addAll(
+                    Arrays.asList("Position","Team","Games","Wins","ETWins","ETLosses",
+                            "Losses","Points","Goals Scored","Goals Conceded","Goal Difference"));
+        }
+        else{
+            this.tableContents.addAll(
+                    Arrays.asList("Position","Team","Games","Wins","Draws",
+                            "Losses","Points","Goals Scored","Goals Conceded",
+                            "Goal Difference"));
+        
+        }
     }
     
     public void sortLeagueTable(){
@@ -45,5 +63,13 @@ public class League {
     
     public ArrayList<Match> getMatches(){
         return this.matches;
+    }
+    
+    public boolean doGamesEndInDraw(){
+        return this.hasEt;
+    }
+    
+    public ArrayList<String> getTableContents(){
+        return this.tableContents;
     }
 }

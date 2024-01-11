@@ -10,9 +10,13 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -33,6 +37,7 @@ public class LeagueWindow extends Application {
         Tab statisticsTab = new Tab("Team statistics");
         Tab playGameTab = new Tab("Play next match");
         
+        createTableTab(tableTab,this.league);
         
         Button btn = new Button();
         btn.setText("Say 'Hello World'");
@@ -51,7 +56,7 @@ public class LeagueWindow extends Application {
         
         Scene scene = new Scene(root, 300, 250);
         
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("League");
         primaryStage.setScene(scene);
         primaryStage.show();
     }    
@@ -59,4 +64,37 @@ public class LeagueWindow extends Application {
     public void setLeague(League league){
         this.league = league;
     }
+    
+    public void tableTitles(GridPane pane,ArrayList<String> tableContents){
+        int column = 0;
+        for(String str : tableContents){
+            pane.add(new Label(str),column,0);
+            ++column;
+        }
+        
+    }
+    
+    public void createTableTab(Tab tab, League league){
+        Label topLabel = new Label("League table:");
+        GridPane table = new GridPane();
+        table.setHgap(10);
+        table.setVgap(10);
+        league.sortLeagueTable();
+        
+        ArrayList<String> tableContents = league.getTableContents();
+        tableTitles(table,tableContents);
+        
+        int positionNum = 1;
+        
+        for(Team team : league.getTeams()){
+            int column = 0;
+            for(String str : tableContents){
+                table.add(new Label(team.getSpecificStat(str).toString()),column,positionNum);
+                ++column;
+            }
+            ++positionNum;
+        }
+        tab.setContent(table);
+    }
+    
 }

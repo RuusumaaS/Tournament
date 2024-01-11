@@ -74,7 +74,7 @@ public class TeamsWindow extends Application {
                     }
                     ArrayList<Team> teams = createTeams(teamNames,statsToCollect,hasET);
                     ArrayList<Match> matches = createAllMatches(teams,mutualMatches,statsToCollect,hasET);
-                    League league = new League(getLeagueName(),teams,matches,tableRules,matchPoints);
+                    League league = new League(getLeagueName(),teams,matches,tableRules,matchPoints,hasET);
                     openLeagueWindow(league);
                     primaryStage.close();
                 }
@@ -186,8 +186,8 @@ public class TeamsWindow extends Application {
                 }
                 else{
                     if(everyOther % 2 == 0){
-                        Match newMatch = new Match(i-numOfTeams*(countOfRound-1),teams.get(j)
-                                ,teams.get(i),stats,hasET);
+                        Match newMatch = new Match(i,teams.get(j)
+                                ,teams.get(i-numOfTeams*(countOfRound-1)),stats,hasET);
                     }
                     else{
                         Match newMatch = new Match(i,teams.get(i-numOfTeams*(countOfRound-1))

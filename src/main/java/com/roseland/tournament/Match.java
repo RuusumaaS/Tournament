@@ -77,4 +77,8 @@ public class Match {
             }  
         }
     }
+    
+    public void defineExtraTime(boolean wentToET){
+        this.extraTime = wentToET;
+    }
 }
