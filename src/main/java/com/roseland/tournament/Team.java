@@ -28,7 +28,7 @@ public class Team {
         return statistics;
     }
     public Double getPoints(){
-        return this.getSpecificStat("points");
+        return this.getSpecificStat("Points");
     }
     
     public Double getSpecificStat(String stat){
@@ -53,7 +53,7 @@ public class Team {
     }
     
     public void updateGoalDifference(){
-        statistics.put("GoalDiffernece", this.getSpecificStat("scoredgoals")-this.getSpecificStat("concededgoals"));
+        statistics.put("Goal Difference", this.getSpecificStat("Goals Scored")-this.getSpecificStat("Goals Conceded"));
     }
 }
 

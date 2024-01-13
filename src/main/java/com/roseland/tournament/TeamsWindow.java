@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 
 
 /**
@@ -28,10 +27,13 @@ import java.util.HashMap;
  */
 public class TeamsWindow extends Application {
     
+    private static final int upperLimit = 20; 
+    private static final int lowerLimit = 3;
+    
     private String name;
     private Map<String,Integer> matchPoints;
     private List<Comparator<Team>> tableRules;
-    private Map<String,Double> statsToCollect;
+    private ArrayList<String> statsToCollect;
     private int mutualMatches;
     
     
@@ -51,7 +53,8 @@ public class TeamsWindow extends Application {
             
             @Override
             public void handle(ActionEvent event){
-                if(!teamName.getText().equals("") && !teamNames.contains(teamName.getText())){
+                if(!teamName.getText().equals("") && !teamNames.contains(teamName.getText())&&
+                        teamNames.size() < upperLimit){
                     teamNames.add(teamName.getText());
                     teamsListed.setText(teamsListed.getText()+teamName.getText()+"\n");
                     teamName.setText("");
@@ -64,7 +67,7 @@ public class TeamsWindow extends Application {
             
             @Override
             public void handle(ActionEvent event) {
-                if(teamNames.size() > 2){
+                if(teamNames.size() >= lowerLimit){
                     boolean hasET;
                     if(matchPoints.containsKey("Draw")){
                         hasET = false;
@@ -72,9 +75,9 @@ public class TeamsWindow extends Application {
                     else{
                         hasET = true;
                     }
-                    ArrayList<Team> teams = createTeams(teamNames,statsToCollect,hasET);
-                    ArrayList<Match> matches = createAllMatches(teams,mutualMatches,statsToCollect,hasET);
-                    League league = new League(getLeagueName(),teams,matches,tableRules,matchPoints,hasET);
+                    
+                    League league = new League(getLeagueName(),teamNames,tableRules,
+                            matchPoints,statsToCollect,mutualMatches,hasET);
                     openLeagueWindow(league);
                     primaryStage.close();
                 }
@@ -100,7 +103,7 @@ public class TeamsWindow extends Application {
 
     
     public void setArguments(String leagueName,Map<String,Integer> matchRules
-            ,List<Comparator<Team>> tableRules, Map<String,Double> statsToCollect, int matches){
+            ,List<Comparator<Team>> tableRules, ArrayList<String> statsToCollect, int matches){
         this.name = leagueName;
         this.matchPoints = matchRules;
         this.tableRules = tableRules;
@@ -110,96 +113,6 @@ public class TeamsWindow extends Application {
      
     public String getLeagueName(){
         return this.name;
-    }
-    
-    public ArrayList<Team> createTeams(ArrayList<String> teamNames,Map<String,Double> stats
-        ,boolean hasET){
-        ArrayList<Team> teams = new ArrayList<>();
-        stats.put("Scored",0.0);
-        stats.put("Conceded",0.0);
-        stats.put("GamesPlayed",0.0);
-        stats.put("Wins",0.0);
-        stats.put("Losses",0.0);
-        if(hasET){
-            stats.put("ETWins", 0.0);
-            stats.put("ETLosses",0.0);
-        }
-        else{
-            stats.put("Draws",0.0);
-        }
-        for(String teamName : teamNames){
-            Team newTeam = new Team(teamName,stats);
-            teams.add(newTeam);
-        }
-        return teams;
-    }
-    
-    public int calculateNumberOfMatches(int numOfTeams){
-        
-        if(numOfTeams == 2){
-            return 1;
-        }
-        return numOfTeams-1 + calculateNumberOfMatches(numOfTeams-1);
-    }
-    
-    public int getMatchesAgainstSameTeam(){
-        return this.mutualMatches;
-    }
-    
-    public Map<String,Double> fillMatchStatsMap(Map<String,Double> stats){
-        Map<String,Double> collectStats = new HashMap<>();
-        collectStats.put("homeGoals",0.0);
-        collectStats.put("awayGoals",0.0);
-        for(Map.Entry<String,Double> entry : stats.entrySet()){
-            collectStats.put("home"+entry.getKey(), 0.0);
-            collectStats.put("away"+entry.getKey(), 0.0);
-        }
-        return collectStats;
-    }
-    
-    public ArrayList<Match> createAllMatches(ArrayList<Team> teams,int matchesAgainstEachOther
-            ,Map<String,Double> stats, boolean hasET){
-        int numOfTeams = teams.size();
-        int numOfTotalMatches = matchesAgainstEachOther*calculateNumberOfMatches(numOfTeams);
-        
-        ArrayList<Match> allMatches = new ArrayList<>();
-        
-        int countOfRound = 1;
-        int everyOther = 0;
-        for(int i = 0;i < numOfTotalMatches;++i){
-            if(i/countOfRound == teams.size()){
-                ++countOfRound;
-                everyOther = 0;
-            }
-            
-            for(int j = i-numOfTeams*(countOfRound-1)+1;j < numOfTeams; ++j){
-                
-                if(countOfRound % 2 ==0){
-                    if(everyOther % 2 == 0){
-                        Match newMatch = new Match(i,teams.get(i-numOfTeams*(countOfRound-1))
-                                ,teams.get(j),stats,hasET);
-                    }
-                    else{
-                        Match newMatch = new Match(i,teams.get(j)
-                                ,teams.get(i-numOfTeams*(countOfRound-1)),stats,hasET);
-                    }
-                }
-                else{
-                    if(everyOther % 2 == 0){
-                        Match newMatch = new Match(i,teams.get(j)
-                                ,teams.get(i-numOfTeams*(countOfRound-1)),stats,hasET);
-                    }
-                    else{
-                        Match newMatch = new Match(i,teams.get(i-numOfTeams*(countOfRound-1))
-                                ,teams.get(j),stats,hasET);
-                    }
-                }
-                ++everyOther;
-            }
-            
-        }
-        
-        return allMatches;
     }
     
     public void openLeagueWindow(League league){

@@ -4,6 +4,7 @@ import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -27,6 +28,7 @@ public class App extends Application {
         GridPane mainGrid = new GridPane();
         mainGrid.setHgap(20);
         mainGrid.setVgap(10);
+        mainGrid.setPadding(new Insets(0, 10, 0, 10));
         
         Label enterLeagueLabel = new Label("League name:");
         TextField leagueNameField = new TextField("League name");

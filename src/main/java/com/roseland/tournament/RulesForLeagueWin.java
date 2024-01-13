@@ -5,17 +5,18 @@
 package com.roseland.tournament;
 
 import java.util.Comparator;
-import java.util.Vector;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -35,11 +36,23 @@ import javafx.stage.Stage;
  */
 public class RulesForLeagueWin extends Application {
     
+    private final static ArrayList<String> shotData = new ArrayList<>();
+    private final static ArrayList<String> passData = new ArrayList<>();
+    private final static ArrayList<String> tackleData = new ArrayList<>();
+    private final static Map<String,ArrayList<String>> data = new LinkedHashMap<>();
+    
+    static{
+        shotData.addAll(Arrays.asList("Shots","Shots On Target"));
+        passData.addAll(Arrays.asList("Passes","Succesfull passes"));
+        tackleData.addAll(Arrays.asList("Tackles", "Succesfull tackles"));
+        data.put("Shots",shotData);
+        data.put("Passes",passData);
+        data.put("Tackles",tackleData);
+    }
+    
+    
     private String name;
-    private Vector<Comparator<Team>> rules;
-    
-    
-    
+    private ArrayList<Comparator<Team>> rules;
     
     @Override
     public void start(Stage primaryStage) {
@@ -51,7 +64,7 @@ public class RulesForLeagueWin extends Application {
         Label numOfMatchesLabel = new Label("Choose how many matches each team");
         ChoiceBox numOfMatches = new ChoiceBox();
         numOfMatches.getItems().addAll("1","2","3","4");
-        numOfMatches.setValue(1);
+        numOfMatches.setValue("1");
         
         //Here we make labels and textfield for points user wants to give from wins and
         //draws. Loss during regular time will always give 0 points.
@@ -66,13 +79,13 @@ public class RulesForLeagueWin extends Application {
         TextField eTWinPoints = new TextField("2");
         TextField eTLossPoints = new TextField("1");
         
-        Map<String,Integer> defaultPoints = new HashMap<>();
+        Map<String,Integer> defaultPoints = new LinkedHashMap<>();
         defaultPoints.put("Win",Integer.valueOf(winPoints.getText()));
         defaultPoints.put("Draw",Integer.valueOf(drawPoints.getText()));
         defaultPoints.put("ETWin",Integer.valueOf(eTWinPoints.getText()));
         defaultPoints.put("ETLoss",Integer.valueOf(eTLossPoints.getText()));
         
-        Map<String, TextField> pointsMap = new HashMap<>();
+        Map<String, TextField> pointsMap = new LinkedHashMap<>();
         pointsMap.put("Win",winPoints);
         pointsMap.put("Draw",drawPoints);
         pointsMap.put("ETWin",eTWinPoints);
@@ -137,7 +150,7 @@ public class RulesForLeagueWin extends Application {
         CheckBox passes = new CheckBox("Passes");
         CheckBox tackles = new CheckBox("Tackles");
         
-        Vector<CheckBox> statBoxes = new Vector<>();
+        ArrayList<CheckBox> statBoxes = new ArrayList<>();
         statBoxes.add(shots);
         statBoxes.add(passes);
         statBoxes.add(tackles);
@@ -160,8 +173,8 @@ public class RulesForLeagueWin extends Application {
         row = 0;
         column = 0;
         
-        RadioButton rule1 = new RadioButton("Points,Wins,Goals,GoalDifference");
-        RadioButton rule2 = new RadioButton("Points,Goals,GoalDifference,Wins");
+        RadioButton rule1 = new RadioButton("Points,Wins,GoalDifference,Goals Scored");
+        RadioButton rule2 = new RadioButton("Points,GoalDifference,Goals Scored,Wins");
         
         ToggleGroup radios = new ToggleGroup();
         rule1.setToggleGroup(radios);
@@ -177,7 +190,7 @@ public class RulesForLeagueWin extends Application {
                 Map<String,Integer> matchPoints = createPointSystem(pointsMap,defaultPoints);
                                
                 List<Comparator<Team>> tableRules = createTableRules(radios.selectedToggleProperty().toString());
-                Map<String,Double> statsToCollect = createStatistics(statBoxes);
+                ArrayList<String> statsToCollect = createStatistics(statBoxes);
                 int matches = Integer.valueOf(numOfMatches.getValue().toString());
                 
                 openTeamsWindow(getLeagueName(),matchPoints,tableRules,statsToCollect,matches);
@@ -190,6 +203,7 @@ public class RulesForLeagueWin extends Application {
         GridPane root = new GridPane();
         root.setVgap(20);
         root.setHgap(20);
+        root.setPadding(new Insets(0, 10, 0, 10));
         
         
         root.add(info,column,row,2,1);
@@ -228,7 +242,7 @@ public class RulesForLeagueWin extends Application {
         return this.name;
      }
     private void openTeamsWindow(String leagueName,Map<String,Integer> matchPoints
-            ,List<Comparator<Team>> tableRules, Map<String,Double> statsToCollect, int matches ) {
+            ,List<Comparator<Team>> tableRules, ArrayList<String> statsToCollect, int matches ) {
         
         TeamsWindow teamsWindow = new TeamsWindow();
 
@@ -241,21 +255,25 @@ public class RulesForLeagueWin extends Application {
     
     public List<Comparator<Team>> createTableRules(String rulesString){
         String[] rulesArr = rulesString.split(",");
-        List<Comparator<Team>> tableRules = new Vector<>();
+        List<Comparator<Team>> tableRules = new ArrayList<>();
         
         for(String str : rulesArr){
-            tableRules.add(Comparator.comparing(team -> team.getSpecificStat(str)));
+            tableRules.add(Comparator.comparing(team -> team.getSpecificStat(str)
+                    ,Comparator.reverseOrder()));
         }
+        tableRules.add(Comparator.comparing(team -> team.getName()));
         
         return tableRules;
     }
     
-    public Map<String,Double> createStatistics(Vector<CheckBox> statisticVector){
-        Map<String,Double> statistics = new HashMap<>();
+    public ArrayList<String> createStatistics(ArrayList<CheckBox> statisticVector){
+        ArrayList<String> statistics = new ArrayList<>();
         
         for(CheckBox e : statisticVector){
             if(e.isSelected()){
-                statistics.put(e.getText(), 0.0);
+                for(int i = 0; i < data.get(e.getText()).size(); ++i){
+                    statistics.add(data.get(e.getText()).get(i));
+                }
             }
             
         }
@@ -263,7 +281,7 @@ public class RulesForLeagueWin extends Application {
     }
     
     public Map<String,Integer> createPointSystem(Map<String,TextField> fields,Map<String,Integer> defaults){
-        Map<String,Integer> pointSystem = new HashMap<>();
+        Map<String,Integer> pointSystem = new LinkedHashMap<>();
         
         for(Map.Entry<String,TextField> entry : fields.entrySet()){
             if(!entry.getValue().isDisabled()){
