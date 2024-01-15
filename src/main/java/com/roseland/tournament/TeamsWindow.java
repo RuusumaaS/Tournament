@@ -30,12 +30,7 @@ public class TeamsWindow extends Application {
     private static final int upperLimit = 20; 
     private static final int lowerLimit = 3;
     
-    private String name;
-    private Map<String,Integer> matchPoints;
-    private List<Comparator<Team>> tableRules;
-    private ArrayList<String> statsToCollect;
-    private int mutualMatches;
-    
+    private League league;
     
     @Override
     public void start(Stage primaryStage) {
@@ -68,16 +63,9 @@ public class TeamsWindow extends Application {
             @Override
             public void handle(ActionEvent event) {
                 if(teamNames.size() >= lowerLimit){
-                    boolean hasET;
-                    if(matchPoints.containsKey("Draw")){
-                        hasET = false;
-                    }
-                    else{
-                        hasET = true;
-                    }
                     
-                    League league = new League(getLeagueName(),teamNames,tableRules,
-                            matchPoints,statsToCollect,mutualMatches,hasET);
+                    getLeague().createTeams(teamNames);
+                    
                     openLeagueWindow(league);
                     primaryStage.close();
                 }
@@ -102,17 +90,12 @@ public class TeamsWindow extends Application {
     }
 
     
-    public void setArguments(String leagueName,Map<String,Integer> matchRules
-            ,List<Comparator<Team>> tableRules, ArrayList<String> statsToCollect, int matches){
-        this.name = leagueName;
-        this.matchPoints = matchRules;
-        this.tableRules = tableRules;
-        this.statsToCollect = statsToCollect;
-        this.mutualMatches = matches;
+    public void setLeague(League league){
+        this.league = league;
     }
      
-    public String getLeagueName(){
-        return this.name;
+    public League getLeague(){
+        return this.league;
     }
     
     public void openLeagueWindow(League league){

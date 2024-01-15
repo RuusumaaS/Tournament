@@ -19,6 +19,9 @@ import javafx.scene.control.TabPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.TextField;
+import javafx.scene.control.CheckBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 
 import java.util.ArrayList;
@@ -135,100 +138,135 @@ public class LeagueWindow extends Application {
     
     
     public void createPlayTab(Tab tab, League league){
-        Match nextMatch = league.getNextMatch();
-        ArrayList<TextField> fields = new ArrayList<>();
-        Map<Label,TextField> homeFields = new LinkedHashMap<>();
-        Map<Label,TextField> awayFields = new LinkedHashMap<>();
         
-        
-        BorderPane border = new BorderPane();
-        
-        Label gameInfo = new Label("Game number " + nextMatch.getMatchId() + ": "
-                + nextMatch.getHomeTeam().getName() + " - " + nextMatch.getAwayTeam().getName());
-        gameInfo.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-        
-        border.setTop(gameInfo);
-        
-        
-        UnaryOperator<TextFormatter.Change> filter = change -> {
-            String newText = change.getControlNewText();
-
-            // Use a regular expression to allow only numeric input
-            if (Pattern.matches("\\d*", newText)) {
-                return change; // Accept the change
-            } else {
-                return null; // Reject the change
-            }
-        };
-
-        GridPane center = createBasicGrid();
-        
-        // Apply the TextFormatter to the TextField
-        TextFormatter<String> formHome = new TextFormatter<>(filter);
-        TextFormatter<String> formAway = new TextFormatter<>(filter);
-        
-        Label homeLabel = new Label(nextMatch.getHomeTeam().getName()+":");
-        Label awayLabel = new Label(nextMatch.getAwayTeam().getName()+":");
-        
-        Label goals = new Label("Goals");
-        
-        TextField homeGoals = new TextField();
-        TextField awayGoals = new TextField();
-        homeGoals.setTextFormatter(formHome);
-        awayGoals.setTextFormatter(formAway);
-        
-        fields.add(homeGoals);
-        fields.add(awayGoals);
-        
-        center.add(homeLabel,0,0);
-        center.add(awayLabel,2,0);
-        center.add(goals, 1, 1);
-        center.add(homeGoals,0,1);
-        center.add(awayGoals,2,1);
-        
-        int row = 2;
-        for(String str : league.getAdditionalStats()){
-            Label stat = new Label(str);
-            TextField homeStat = new TextField();
-            TextField awayStat = new TextField();
-            
-            fields.add(homeStat);
-            fields.add(awayStat);
-            homeFields.put(stat,homeStat);
-            awayFields.put(stat, awayStat);
-            
-            center.add(homeStat,0,row);
-            center.add(stat,1,row);
-            center.add(awayStat,2,row);
-            ++row;
+        if(league.getFixtures().isEmpty()){
+            Label over = new Label("The league is over and the winner is: "
+                    + league.getWinner().getName());
+            over.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+            StackPane stack = new StackPane();
+            stack.getChildren().add(over);
+            tab.setContent(stack);
         }
         
-        Button end = new Button("End the game");
-        
-        end.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                if(fieldsFilled(fields)){
-                    if(!(homeGoals.getText().equals(awayGoals.getText()) && !league.doGamesEndInDraw())){
-                        nextMatch.setResult(Integer.valueOf(awayGoals.getText()),
-                                Integer.valueOf(homeGoals.getText()));
-                        league.endMatch(nextMatch);
-                        endTheMatch(nextMatch,homeFields,awayFields);
-                        
-                    }
-                    
-                    
+        else{
+            Match nextMatch = league.getNextMatch();
+            ArrayList<TextField> fields = new ArrayList<>();
+            Map<Label,TextField> homeFields = new LinkedHashMap<>();
+            Map<Label,TextField> awayFields = new LinkedHashMap<>();
+
+
+            BorderPane border = new BorderPane();
+
+            Label gameInfo = new Label("Game number " + nextMatch.getMatchId() + ": "
+                    + nextMatch.getHomeTeam().getName() + " - " + nextMatch.getAwayTeam().getName());
+            gameInfo.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+
+            border.setTop(gameInfo);
+
+
+            UnaryOperator<TextFormatter.Change> filter = change -> {
+                String newText = change.getControlNewText();
+
+                // Use a regular expression to allow only numeric input
+                if (Pattern.matches("\\d*", newText)) {
+                    return change; // Accept the change
+                } else {
+                    return null; // Reject the change
                 }
-                
-                
+            };
+
+            GridPane center = createBasicGrid();
+
+            // Apply the TextFormatter to the TextField
+            TextFormatter<String> formHome = new TextFormatter<>(filter);
+            TextFormatter<String> formAway = new TextFormatter<>(filter);
+
+            Label homeLabel = new Label(nextMatch.getHomeTeam().getName()+":");
+            Label awayLabel = new Label(nextMatch.getAwayTeam().getName()+":");
+
+            Label goals = new Label("Goals");
+
+            TextField homeGoals = new TextField();
+            TextField awayGoals = new TextField();
+            homeGoals.setTextFormatter(formHome);
+            awayGoals.setTextFormatter(formAway);
+
+            fields.add(homeGoals);
+            fields.add(awayGoals);
+
+            center.add(homeLabel,0,0);
+            center.add(awayLabel,2,0);
+            center.add(goals, 1, 1);
+            center.add(homeGoals,0,1);
+            center.add(awayGoals,2,1);
+
+            int row = 2;
+            for(String str : league.getAdditionalStats()){
+                Label stat = new Label(str);
+                TextField homeStat = new TextField();
+                TextField awayStat = new TextField();
+
+                fields.add(homeStat);
+                fields.add(awayStat);
+                homeFields.put(stat,homeStat);
+                awayFields.put(stat, awayStat);
+
+                center.add(homeStat,0,row);
+                center.add(stat,1,row);
+                center.add(awayStat,2,row);
+                ++row;
             }
-        });
+            CheckBox et = new CheckBox("Add extratime");
+            if(!league.doGamesEndInDraw()){
+                et.setVisible(false);
+                et.disableProperty();
+                nextMatch.setExtraTime(false);
+            }
+            center.add(et, 5, 1);
+            
+            Button end = new Button("End the game");
+
+            end.setOnAction(new EventHandler<ActionEvent>() {
+
+                @Override
+                public void handle(ActionEvent event) {
+                    if(fieldsFilled(fields)){
+                        if(homeGoals.getText().equals(awayGoals.getText()) && league.doGamesEndInDraw()){
+                            
+                        }
+                        else{
+                            
+                            nextMatch.setExtraTime(et.isSelected());
+                            
+                            nextMatch.setResult(Integer.valueOf(homeGoals.getText()),
+                                    Integer.valueOf(awayGoals.getText()));
+                            league.endMatch(nextMatch);
+                            endTheMatch(nextMatch,homeFields,awayFields);
+                            if(league.getFixtures().isEmpty()){
+                                league.sortLeagueTable();
+                                league.setWinner(league.getTeams().get(0));
+                            }
+                            refreshTabs();
+                        }
+
+
+                    }
+
+
+                }
+            });
+            HBox hbox = new HBox();
+            hbox.setPadding(new Insets(15, 15, 15, 15));
+            hbox.setSpacing(10);
+            hbox.getChildren().add(end);
+
+            border.setCenter(center);
+            border.setBottom(hbox);
+
+         
+            tab.setContent(border);
+        }
         
-        border.setCenter(center);
-        border.setBottom(end);
-        
-        tab.setContent(border);
     }
     
     public boolean fieldsFilled(ArrayList<TextField> fields){
@@ -239,15 +277,6 @@ public class LeagueWindow extends Application {
         }
         
         return true;
-    }
-    
-    public Map<String,Double> createStatMap(Map<Label,TextField> stats){
-        Map<String,Double> stat = new LinkedHashMap<>();
-        for(Map.Entry<Label,TextField> entry : stats.entrySet()){
-            stat.put(entry.getKey().getText(), Double.valueOf(entry.getValue().getText()));
-        }
-        
-        return stat;
     }
     
     public void createStatisticsTab(Tab tab, League league){
@@ -335,8 +364,15 @@ public class LeagueWindow extends Application {
         Map<String,Double> homeStats = createStatMap(homeFields);
         Map<String,Double> awayStats = createStatMap(awayFields);
         match.setStatistics(homeStats, awayStats);
-        refreshTabs();
+        
     }
     
-    
+    public Map<String,Double> createStatMap(Map<Label,TextField> stats){
+        Map<String,Double> stat = new LinkedHashMap<>();
+        for(Map.Entry<Label,TextField> entry : stats.entrySet()){
+            stat.put(entry.getKey().getText(), Double.valueOf(entry.getValue().getText()));
+        }
+        
+        return stat;
+    }
 }

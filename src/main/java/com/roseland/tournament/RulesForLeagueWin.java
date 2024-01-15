@@ -173,8 +173,8 @@ public class RulesForLeagueWin extends Application {
         row = 0;
         column = 0;
         
-        RadioButton rule1 = new RadioButton("Points,Wins,GoalDifference,Goals Scored");
-        RadioButton rule2 = new RadioButton("Points,GoalDifference,Goals Scored,Wins");
+        RadioButton rule1 = new RadioButton(",Points,Wins,Goal Difference,Goals Scored");
+        RadioButton rule2 = new RadioButton("Points,Goal Difference,Goals Scored,Wins");
         
         ToggleGroup radios = new ToggleGroup();
         rule1.setToggleGroup(radios);
@@ -192,8 +192,9 @@ public class RulesForLeagueWin extends Application {
                 List<Comparator<Team>> tableRules = createTableRules(radios.selectedToggleProperty().toString());
                 ArrayList<String> statsToCollect = createStatistics(statBoxes);
                 int matches = Integer.valueOf(numOfMatches.getValue().toString());
-                
-                openTeamsWindow(getLeagueName(),matchPoints,tableRules,statsToCollect,matches);
+                League league = new League(getLeagueName(),tableRules,matchPoints
+                        ,statsToCollect,matches,extraTime.isSelected());
+                openTeamsWindow(league);
                 primaryStage.close();
             }
         });
@@ -234,20 +235,13 @@ public class RulesForLeagueWin extends Application {
         primaryStage.show();
     }
     
-    public void setLeagueName(String leagueName){
-        this.name = leagueName;
-    }
-     
-    public String getLeagueName(){
-        return this.name;
-     }
-    private void openTeamsWindow(String leagueName,Map<String,Integer> matchPoints
-            ,List<Comparator<Team>> tableRules, ArrayList<String> statsToCollect, int matches ) {
+    
+    private void openTeamsWindow(League league) {
         
         TeamsWindow teamsWindow = new TeamsWindow();
 
         // Pass parameters to the second window (if needed)
-        teamsWindow.setArguments(leagueName, matchPoints,tableRules,statsToCollect,matches);
+        teamsWindow.setLeague(league);
 
         // Show the second window
         teamsWindow.start(new Stage());
@@ -258,8 +252,7 @@ public class RulesForLeagueWin extends Application {
         List<Comparator<Team>> tableRules = new ArrayList<>();
         
         for(String str : rulesArr){
-            tableRules.add(Comparator.comparing(team -> team.getSpecificStat(str)
-                    ,Comparator.reverseOrder()));
+            tableRules.add(Comparator.comparing(team -> team.getSpecificStat(str),Comparator.reverseOrder()));
         }
         tableRules.add(Comparator.comparing(team -> team.getName()));
         
@@ -297,4 +290,14 @@ public class RulesForLeagueWin extends Application {
         
         return pointSystem;
     }
+    
+    
+    public void setLeagueName(String leagueName){
+        this.name = leagueName;
+    }
+     
+    public String getLeagueName(){
+        return this.name;
+     }
+    
 }

@@ -20,12 +20,15 @@ public class Match {
     private int awayGoals;
     private int homeGoals;
     private boolean gameOver;
+    private Map<String,Integer> pointsSystem;
     
-    public Match(Team homeTeam, Team awayTeam,Map<String,Double> statistics, boolean extratime){
+    public Match(Team homeTeam, Team awayTeam
+            , boolean extratime,Map<String,Integer> pointsSystem){
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.winner = null;
        this.gameOver = false;
+       this.pointsSystem = pointsSystem;
     }
     
    
@@ -42,31 +45,35 @@ public class Match {
     
     public void givePoints(){
         if(winner==null){
-            this.homeTeam.addToSpecificStat("Points", 1.0);
-            this.awayTeam.addToSpecificStat("Points", 1.0);
+            this.homeTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("Draw")));
+            this.awayTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("Draw")));
         }
         else if(winner.equals(homeTeam)){
             if(extraTime ==true){
-                homeTeam.addToSpecificStat("Points", 2.0);
-                awayTeam.addToSpecificStat("Points", 1.0);
+                homeTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("ETWin")));
+                awayTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("ETLoss")));
             }
             else{
-                homeTeam.addToSpecificStat("Points", 3.0);
+                homeTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("Win")));
             }
             
         }
         else if(winner.equals(awayTeam)){
             if(extraTime ==true){
-                awayTeam.addToSpecificStat("Points", 2.0);
-                homeTeam.addToSpecificStat("Points", 1.0);
+                awayTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("ETWin")));
+                homeTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("ETLoss")));
             }
             else{
-                awayTeam.addToSpecificStat("Points", 3.0);
+                awayTeam.addToSpecificStat("Points", Double.valueOf(this.pointsSystem.get("Win")));
             }  
         }
     }
     
-    public void defineExtraTime(boolean wentToET){
+    public boolean getExtraTime(){
+        return this.extraTime;
+    }
+    
+    public void setExtraTime(boolean wentToET){
         this.extraTime = wentToET;
     }
     
@@ -111,12 +118,26 @@ public class Match {
             this.homeTeam.addToSpecificStat("Draws",1.0);
         }
         else if(this.winner == this.homeTeam){
-            this.awayTeam.addToSpecificStat("Losses", 1.0);
-            this.homeTeam.addToSpecificStat("Wins", 1.0);
+            if(getExtraTime()){
+                this.awayTeam.addToSpecificStat("ETLosses", 1.0);
+                this.homeTeam.addToSpecificStat("ETWins", 1.0);
+            }
+            else{
+                this.awayTeam.addToSpecificStat("Losses", 1.0);
+                this.homeTeam.addToSpecificStat("Wins", 1.0);
+            }
+            
         }
         else{
-            this.awayTeam.addToSpecificStat("Losses", 1.0);
-            this.homeTeam.addToSpecificStat("Wins", 1.0);
+            if(getExtraTime()){
+                this.homeTeam.addToSpecificStat("ETLosses", 1.0);
+                this.awayTeam.addToSpecificStat("ETWins", 1.0);
+            }
+            else{
+                this.homeTeam.addToSpecificStat("Losses", 1.0);
+                this.awayTeam.addToSpecificStat("Wins", 1.0);
+            }
+            
         }
         this.awayTeam.addToSpecificStat("Games", 1.0);
         this.homeTeam.addToSpecificStat("Games", 1.0);
@@ -160,5 +181,6 @@ public class Match {
         this.awayTeam.updateGoalDifference();
         this.homeTeam.updateGoalDifference();
     }
+    
     
 }

@@ -31,19 +31,19 @@ public class League {
     private ArrayList<Match> fixtures;
     private ArrayList<Match> playedFixtures;
     private List<Comparator<Team>> tableRules;
-    private Map<String, Integer> matchRules; 
+    private Map<String, Integer> matchPoints; 
     private final boolean hasEt;
     private ArrayList<String> additionalStats;
     private final int mutualMatches;
     private Team winner;
     
-    public League(String name, ArrayList<String> teamNames,List<Comparator<Team>> tableRules,
+    public League(String name,List<Comparator<Team>> tableRules,
             Map<String, Integer> matchPoints, ArrayList<String> additionalStats, int mutualMatches,
             boolean hasET){
         
         this.name = name;
         this.tableRules = tableRules;
-        this.matchRules = matchPoints;
+        this.matchPoints = matchPoints;
         this.hasEt = hasET;
         this.additionalStats = additionalStats;
         this.mutualMatches = mutualMatches;
@@ -56,17 +56,15 @@ public class League {
         else{
             tableContents.remove("ETWins");
             tableContents.remove("ETLosses");
-        
+            
         }
         
-        this.teams = this.createTeams(teamNames, hasET);
-        this.fixtures = this.createAllMatches(this.teams, mutualMatches, hasET);
         
     }
     
     public void sortLeagueTable(){
         
-        Comparator<Team> comparator = tableRules.stream()
+        Comparator<Team> comparator = getTableRules().stream()
                 .reduce(Comparator::thenComparing)
                 .orElseThrow();
         Collections.sort(this.teams, comparator);
@@ -81,17 +79,18 @@ public class League {
         return tableContents;
     }
     
-    public ArrayList<Match> createAllMatches(ArrayList<Team> teams,int mutualMatches, boolean hasET){
-        int numOfTeams = teams.size();
-        System.out.println(teams.size());
-        int numOfTotalMatches = mutualMatches*calculateNumberOfMatches(numOfTeams);
-        Map<String,Double> stats = this.fillMatchStatsMap();
+    public void createAllMatches(){
+        ArrayList<Team> teams = getTeams();
+        int numOfTeams = getTeams().size();
+        
+        int numOfTotalMatches = getMutualMatches()*calculateNumberOfMatches(numOfTeams);
+        //Map<String,Double> stats = this.fillMatchStatsMap();
         
         ArrayList<Match> allMatches = new ArrayList<>();
         
         int countOfRound = 1;
         int everyOther = 0;
-        for(int i = 0;i < numOfTotalMatches;++i){
+        for(int i = 0;i < getMutualMatches()*teams.size();++i){
             if(i/countOfRound == teams.size()){
                 ++countOfRound;
                 everyOther = 0;
@@ -102,24 +101,24 @@ public class League {
                 if(countOfRound % 2 ==0){
                     if(everyOther % 2 == 0){
                         Match newMatch = new Match(teams.get(i-numOfTeams*(countOfRound-1))
-                                ,teams.get(j),stats,hasET);
+                                ,teams.get(j),this.doGamesEndInDraw(),this.matchPoints);
                         allMatches.add(newMatch);
                     }
                     else{
                         Match newMatch = new Match(teams.get(j)
-                                ,teams.get(i-numOfTeams*(countOfRound-1)),stats,hasET);
+                                ,teams.get(i-numOfTeams*(countOfRound-1)),this.doGamesEndInDraw(),this.matchPoints);
                         allMatches.add(newMatch);
                     }
                 }
                 else{
                     if(everyOther % 2 == 0){
                         Match newMatch = new Match(teams.get(j)
-                                ,teams.get(i-numOfTeams*(countOfRound-1)),stats,hasET);
+                                ,teams.get(i-numOfTeams*(countOfRound-1)),this.doGamesEndInDraw(),this.matchPoints);
                         allMatches.add(newMatch);
                     }
                     else{
                         Match newMatch = new Match(teams.get(i-numOfTeams*(countOfRound-1))
-                                ,teams.get(j),stats,hasET);
+                                ,teams.get(j),this.doGamesEndInDraw(),this.matchPoints);
                         allMatches.add(newMatch);
                     }
                 }
@@ -131,21 +130,21 @@ public class League {
         //Not a proper shuffling for a league.
         Collections.shuffle(allMatches);
         for(int i = 0; i < allMatches.size();++i){
-            allMatches.get(i).setMatchId(i);
+            allMatches.get(i).setMatchId(i+1);
         }
-        
-        return allMatches;
+        System.out.println("match number: "+ allMatches.size());
+        this.fixtures = allMatches;
     }
     
-    public Map<String,Double> fillMatchStatsMap(){
+    /*public Map<String,Double> fillMatchStatsMap(){
         Map<String,Double> collectStats = new LinkedHashMap<>();
         for(String str : this.getAdditionalStats()){
             collectStats.put(str,0.0);
         }
         return collectStats;
-    }
+    }*/
     
-    public ArrayList<Team> createTeams(ArrayList<String> teamNames,boolean hasET){
+    public void createTeams(ArrayList<String> teamNames){
         ArrayList<Team> teams = new ArrayList<>();
         Map<String,Double> stats = new LinkedHashMap<>();
         
@@ -162,7 +161,9 @@ public class League {
             teams.add(newTeam);
         }
         
-        return teams;
+        this.teams = teams;
+        
+        createAllMatches();
     }
     
     public int calculateNumberOfMatches(int numOfTeams){
@@ -196,8 +197,12 @@ public class League {
         return this.getFixtures().get(0);
     }
     
-    public int getMatchesAgainstSameTeam(){
+    public int getMutualMatches(){
         return this.mutualMatches;
+    }
+    
+    public List<Comparator<Team>> getTableRules(){
+        return this.tableRules;
     }
     
     public ArrayList<String> getAdditionalStats(){
