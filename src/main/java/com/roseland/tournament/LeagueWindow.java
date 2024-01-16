@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.TextField;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
+import javafx.geometry.Pos;
 import javafx.scene.control.TextFormatter;
 
 /**
@@ -53,8 +55,10 @@ public class LeagueWindow extends Application {
         createTableTab(this.tableTab,this.league);
         
         this.resultsTab = new Tab("Results");
+        createResultsTab(this.resultsTab,this.league);
         
         this.fixturesTab = new Tab("Fixtures");
+        createFixturesTab(this.fixturesTab,this.league);
         
         this.playGameTab = new Tab("Next match");
         createPlayTab(this.playGameTab,this.league);
@@ -320,8 +324,8 @@ public class LeagueWindow extends Application {
             tab.setContent(pane);
         }
         else{
-            
-            
+            ArrayList<Match> results = league.getPlayedFixtures();
+            fillFixturesOrResultsTab(results,tab,"Last");
         }
         
     }
@@ -330,13 +334,17 @@ public class LeagueWindow extends Application {
     public void createFixturesTab(Tab tab,League league){
         if(league.getFixtures().isEmpty()){
             Label empty = new Label("No more games to be played");
+            empty.setFont(Font.font("Arial", FontWeight.BOLD, 20));
             StackPane pane = new StackPane();
             pane.getChildren().add(empty);
             tab.setContent(pane);
         }
         else{
-            
+            ArrayList<Match> fixtures = league.getFixtures();
+            fillFixturesOrResultsTab(fixtures,tab,"Next");
+         
         }
+        
     }
     
     public GridPane createBasicGrid(){
@@ -375,4 +383,51 @@ public class LeagueWindow extends Application {
         
         return stat;
     }
+    
+    public void fillFixturesOrResultsTab(ArrayList<Match> fixtures,Tab tab, String nextOrLast){
+        ScrollPane scroll = new ScrollPane();
+        VBox vbox = new VBox();
+        vbox.setPadding(new Insets(10));
+        vbox.setSpacing(8);
+        HBox hbox = new HBox();
+        hbox.setPadding(new Insets(10));
+        hbox.setSpacing(8);
+
+        Label nextMatchLabel = new Label(nextOrLast +" match: ");
+        nextMatchLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+
+        Label matchInfo = new Label(fixtures.get(0).toString());
+        matchInfo.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+
+        hbox.getChildren().addAll(nextMatchLabel,matchInfo);
+        hbox.setAlignment(Pos.CENTER);
+
+        VBox otherFixtures = new VBox();
+        otherFixtures.setPadding(new Insets(10));
+        otherFixtures.setSpacing(8);
+        otherFixtures.setAlignment(Pos.CENTER);
+
+        fillFixtures(fixtures,otherFixtures);
+
+        scroll.setContent(otherFixtures);
+
+        vbox.getChildren().addAll(hbox,scroll);
+        tab.setContent(vbox);
+        
+        
+    }
+    
+    public void fillFixtures(ArrayList<Match> fixtures,VBox otherFixtures){
+        if(fixtures.size() > 1){
+                for(int i = 1; i < fixtures.size();++i){
+                    HBox labelBox = new HBox();
+                    Label match = new Label(fixtures.get(i).getMatchId() + ". " + fixtures.get(i).toString());
+                    match.setFont(Font.font("Arial", 16));
+                    labelBox.getChildren().add(match);
+                    otherFixtures.getChildren().add(labelBox);
+                }
+                
+            }
+    }
+    
 }

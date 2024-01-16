@@ -224,7 +224,7 @@ public class League {
     
     public void endMatch(Match match){
         match.endTheGame();
-        this.playedFixtures.add(match);
+        this.playedFixtures.add(0,match);
         int index = this.fixtures.indexOf(match);
         this.fixtures.remove(index);
     }
